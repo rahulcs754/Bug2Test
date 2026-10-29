@@ -1,0 +1,6 @@
+{
+  "GET /repos/acme/shop/git/ref/heads/main": { "status": 200, "body": { "ref": "refs/heads/main", "object": { "sha": "a1b2c3d4", "type": "commit" } } },
+  "POST /repos/acme/shop/git/refs": { "status": 201, "body": { "ref": "refs/heads/bug2test/cart-total", "object": { "sha": "a1b2c3d4" } } },
+  "PUT /repos/acme/shop/contents/tests/bugs/cart-total.spec.ts": { "status": 201, "body": { "content": { "path": "tests/bugs/cart-total.spec.ts" } } },
+  "POST /repos/acme/shop/pulls": { "status": 201, "body": { "number": 42, "html_url": "https://github.com/acme/shop/pull/42" } }
+}
