@@ -1,0 +1,17 @@
+{
+  "title": "Login button stays disabled with valid details",
+  "actual": "Sign in button never enables",
+  "startUrl": "https://staging.example.com/login?next=/home",
+  "steps": [
+    { "type": "fill", "target": { "kind": "label", "value": "Email" }, "value": "qa@example.com" },
+    { "type": "fill", "target": { "kind": "label", "value": "Password" }, "value": "", "env": "B2T_PASSWORD" },
+    { "type": "check", "target": { "kind": "role", "role": "checkbox", "name": "I agree to the terms" }, "checked": true },
+    {
+      "type": "expect",
+      "target": { "kind": "role", "role": "button", "name": "Sign in" },
+      "assertion": { "kind": "enabled" }
+    }
+  ],
+  "consoleErrors": ["TypeError: Cannot read properties of undefined (reading 'valid')"],
+  "networkFailures": [{ "method": "POST", "url": "https://staging.example.com/api/validate", "status": 500 }]
+}

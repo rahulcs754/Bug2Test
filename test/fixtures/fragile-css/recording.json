@@ -1,0 +1,16 @@
+{
+  "title": "Search 'shoes' goes to wrong page",
+  "actual": "",
+  "startUrl": "http://localhost:3000/",
+  "steps": [
+    { "type": "goto", "url": "http://localhost:3000/" },
+    { "type": "fill", "target": { "kind": "placeholder", "value": "Search products" }, "value": "it's shoes" },
+    { "type": "press", "target": { "kind": "placeholder", "value": "Search products" }, "key": "Enter" },
+    { "type": "click", "target": { "kind": "css", "value": "#results > div:nth-of-type(2)" } },
+    { "type": "select", "target": { "kind": "label", "value": "Size" }, "value": "9" },
+    { "type": "expect", "assertion": { "kind": "url", "value": "http://localhost:3000/p/shoes?size=9" } },
+    { "type": "expect", "target": { "kind": "text", "value": "Out of stock" }, "assertion": { "kind": "hidden" } }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}

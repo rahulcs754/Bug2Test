@@ -10,7 +10,9 @@ Node 22, TypeScript strict, ESM. Vite build, React for popup/options UI. vitest 
 - `src/core/`: pure logic (events -> selectors -> spec code). No `chrome.*` here, so it is easy to test.
 - `src/content/`: content script that listens to the page.
 - `src/background/`: service worker, stores the recording, talks to GitHub.
-- `src/popup/`, `src/options/`: React UI.
+- `src/content/page.ts`: runs in the page world, reports console errors and failed requests.
+- `src/popup/`, `src/options/`: React UI. `src/shared/`: message types and storage helpers.
+- `site/`: GitHub Pages (landing + demo shop with planted bugs). `e2e/`: loads the real extension.
 
 ## Rules
 - Selectors: prefer `getByTestId` > `getByRole` + name > `getByLabel` > `getByText`. CSS only as last fallback, and mark it with a `// TODO: fragile selector` comment.
@@ -21,7 +23,8 @@ Node 22, TypeScript strict, ESM. Vite build, React for popup/options UI. vitest 
 - Ask for the smallest Chrome permissions possible (`activeTab`, `storage`, `scripting`).
 
 ## Commands
-- `npm test`, `npm run build`, `npm run dev`
+- `npm test`, `npm run build`, `npm run dev`, `npm run test:e2e`
+- Snapshot files: `test/fixtures/<name>/recording.json` -> `expected.spec.ts`. Update with `npx vitest -u` and review the diff.
 
 ## Owner
 Senior React/Next.js dev, India. Wants short, simple English and a clean portfolio-grade repo.

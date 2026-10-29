@@ -1,0 +1,16 @@
+{
+  "title": "Cart total does not update after removing item",
+  "actual": "Total still shows ₹998 after removing one item",
+  "startUrl": "http://localhost:3000/cart",
+  "steps": [
+    { "type": "goto", "url": "http://localhost:3000/cart" },
+    { "type": "click", "target": { "kind": "testid", "value": "remove-item-2" } },
+    {
+      "type": "expect",
+      "target": { "kind": "role", "role": "status", "name": "Cart total" },
+      "assertion": { "kind": "text", "value": "₹499" }
+    }
+  ],
+  "consoleErrors": [],
+  "networkFailures": []
+}
