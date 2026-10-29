@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bug2Test</title>
+    <meta name="description" content="Chrome extension: record a bug in the browser and get a GitHub PR with a failing Playwright test." />
+    <link rel="icon" href="img/icon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --soft: #f6f8fa; --line: #d0d7de;
+        --accent: #7c3aed; --accent-soft: #f3efff; --ok: #1a7f37; --bad: #cf222e;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --soft: #161b22; --line: #30363d;
+          --accent: #a78bfa; --accent-soft: #1e1533; --ok: #3fb950; --bad: #f85149;
+        }
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+      a { color: var(--accent); }
+      .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+      nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; gap: 12px; }
+      nav .brand { display: flex; gap: 10px; align-items: center; font-weight: 700; font-size: 18px; text-decoration: none; color: var(--fg); }
+      nav .links { display: flex; gap: 16px; flex-wrap: wrap; }
+      .hero { padding: 48px 0 32px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; }
+      .hero h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.15; margin: 0 0 16px; letter-spacing: -0.02em; }
+      .hero p { color: var(--muted); font-size: 18px; margin: 0 0 24px; }
+      .btn { display: inline-block; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid var(--line); color: var(--fg); background: var(--soft); }
+      .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      @media (prefers-color-scheme: dark) { .btn.primary { color: #0d1117; } }
+      .hero > *, .grid2 > * { min-width: 0; }
+      .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+      img.shot { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
+      section { padding: 40px 0; border-top: 1px solid var(--line); }
+      h2 { font-size: 26px; margin: 0 0 20px; letter-spacing: -0.01em; }
+      .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: s; padding: 0; list-style: none; margin: 0; }
+      .steps li { background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 16px; counter-increment: s; }
+      .steps li::before { content: counter(s); display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; margin-bottom: 8px; }
+      .steps b { display: block; }
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+      .benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .benefits div { border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+      .benefits h3 { margin: 0 0 6px; font-size: 16px; }
+      .benefits p { margin: 0; color: var(--muted); font-size: 15px; }
+      pre { background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow: auto; font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0; }
+      .c { color: var(--muted); }
+      ol.install li { margin-bottom: 8px; }
+      code { font: 0.9em ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--soft); padding: 1px 5px; border-radius: 4px; }
+      table { border-collapse: collapse; width: 100%; font-size: 15px; }
+      th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      td.yes { color: var(--ok); font-weight: 700; } td.no { color: var(--bad); }
+      .tablewrap { overflow-x: auto; }
+      footer { padding: 32px 0; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+      @media (max-width: 780px) {
+        .hero, .grid2 { grid-template-columns: 1fr; }
+        .steps { grid-template-columns: 1fr 1fr; }
+        .benefits { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 460px) { .steps { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav>
+        <a class="brand" href="./"><img src="img/icon.svg" width="28" height="28" alt="" /> Bug2Test</a>
+        <div class="links">
+          <a href="#how">How it works</a>
+          <a href="#install">Install</a>
+          <a href="demo/">Demo shop</a>
+          <a href="https://github.com/rahulcs754/bug2test">GitHub</a>
+        </div>
+      </nav>
+
+      <header class="hero">
+        <div>
+          <h1>Turn a bug report into a failing Playwright test.</h1>
+          <p>
+            A Chrome extension for testers. Record the bug, click on what is broken, and Bug2Test opens a pull request
+            with a test that fails today and passes once the bug is fixed.
+          </p>
+          <div class="ctas">
+            <a class="btn primary" href="#install">Install (2 min)</a>
+            <a class="btn" href="demo/">Try the demo shop</a>
+          </div>
+        </div>
+        <img class="shot" src="img/popup.png" alt="Bug2Test popup showing recorded steps and the generated Playwright test" width="400" height="780" style="max-width: 360px; justify-self: center" />
+      </header>
+
+      <section id="how">
+        <h2>How it works</h2>
+        <ol class="steps">
+          <li><b>Record</b> Click <i>Start recording</i> on the page with the bug.</li>
+          <li><b>Repeat the bug</b> Click and type as usual. Steps are saved with stable selectors.</li>
+          <li><b>Add expect</b> Click the broken element and say what it <i>should</i> show.</li>
+          <li><b>Open PR</b> Get <code>tests/bugs/&lt;bug&gt;.spec.ts</code> in a new PR.</li>
+        </ol>
+      </section>
+
+      <section>
+        <div class="grid2">
+          <div>
+            <h2>What you get</h2>
+            <pre><span class="c">// Generated by Bug2Test. This test should FAIL until the bug is fixed.
+// Actual behaviour: Total still shows ₹998</span>
+import { test, expect } from '@playwright/test';
+
+test('bug: Cart total does not update', async ({ page }) => {
+  await page.goto('/demo/');
+  await page.getByTestId('remove-item-2').click();
+  await expect(
+    page.getByRole('status', { name: 'Cart total', exact: true })
+  ).toHaveText('₹499');
+});</pre>
+            <p>
+              The PR description also lists the steps, expected vs actual, console errors and failed network calls
+              captured while recording.
+            </p>
+          </div>
+          <img class="shot" src="img/expect-panel.png" alt="The Expect panel on a page: should have text ₹499" width="900" height="700" />
+        </div>
+      </section>
+
+      <section>
+        <h2>Why use it</h2>
+        <div class="benefits">
+          <div><h3>No more "can't reproduce"</h3><p>The test <i>is</i> the reproduction. Devs run one command and see the bug.</p></div>
+          <div><h3>Bugs stay fixed</h3><p>Every bug ends with a regression test in the repo, so it cannot come back silently.</p></div>
+          <div><h3>Testers ship tests</h3><p>QA adds real Playwright tests without writing code or learning selectors.</p></div>
+          <div><h3>Readable selectors</h3><p><code>getByTestId</code> and <code>getByRole</code> first. CSS only as a last resort, marked with a TODO.</p></div>
+          <div><h3>Safe by default</h3><p>Passwords and OTP fields are never recorded. They become env vars. The token stays in your browser.</p></div>
+          <div><h3>Small permissions</h3><p>Asks for the one site you record. Talks only to <code>api.github.com</code>.</p></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Compared to other tools</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th></th><th>Bug2Test</th><th>Jam.dev</th><th>Playwright codegen</th><th>DevTools Recorder</th></tr></thead>
+            <tbody>
+              <tr><td>Made for testers</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No (dev tool)</td><td class="no">Partly</td></tr>
+              <tr><td>"Expected result" as an assertion</td><td class="yes">Yes</td><td class="no">No</td><td class="yes">Yes</td><td class="no">Basic</td></tr>
+              <tr><td>Opens a PR with the test</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+              <tr><td>Console + network context</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="install">
+        <h2>Install</h2>
+        <ol class="install">
+          <li>Download <code>bug2test.zip</code> from the <a href="https://github.com/rahulcs754/bug2test/releases">latest release</a> and unzip it, or build it: <code>npm ci &amp;&amp; npm run build</code>.</li>
+          <li>Open <code>chrome://extensions</code> and turn on <b>Developer mode</b>.</li>
+          <li>Click <b>Load unpacked</b> and pick the unzipped folder (or <code>dist/</code>).</li>
+          <li>Open Bug2Test <b>Settings</b>: add repo owner, repo name and a <a href="https://github.com/settings/personal-access-tokens/new">fine-grained token</a> with <i>Contents</i> and <i>Pull requests</i>: Read and write.</li>
+          <li>Set <b>App base URL</b> to your Playwright <code>baseURL</code> (e.g. <code>http://localhost:3000</code>).</li>
+        </ol>
+        <p>Then open the <a href="demo/">demo shop</a>, remove an item from the cart and record your first bug.</p>
+      </section>
+
+      <footer>
+        Bug2Test is open source (MIT). Built by <a href="https://github.com/rahulcs754">@rahulcs754</a>.
+      </footer>
+    </div>
+  </body>
+</html>
