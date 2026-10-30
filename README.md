@@ -109,8 +109,6 @@ src/options/     React settings page
 site/            GitHub Pages: landing page + demo shop with planted bugs
 ```
 
-Plan and research: [docs/MVP-PLAN.md](docs/MVP-PLAN.md), [docs/RESEARCH.md](docs/RESEARCH.md).
-
 ## Roadmap
 
 - Jira / Linear: link the PR to the ticket
